@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import readVCF
 import sys
 import copy
 import pandas as pd
@@ -63,8 +64,9 @@ def global_filter(df_tumor, df_normal, reject = ['LowQual', 'INDEL_SPECIFIC_FILT
            
            
 if __name__ == "__main__":
-	sample_tumor = sys.argv[1]
-	sample_normal = sys.argv[2]
+
+	sample_tumor = readVCF.read_vcf(sys.argv[1], QC = True)
+	sample_normal = readVCF.read_vcf(sys.argv[2], QC = True)
 	
 	F_sample_tumor, F_sample_normal = global_filter(sample_tumor, sample_normal)
 	
