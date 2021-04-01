@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import readVCF
-import sys
 import copy
 import pandas as pd
 import numpy as np
-from collections import Counter
+
 
 def quality_filter_normal(df_normal, reject = ['LowQual', 'INDEL_SPECIFIC_FILTERS;LowQual'], index = True):
     
@@ -58,19 +57,14 @@ def global_filter(df_tumor, df_normal, reject = ['LowQual', 'INDEL_SPECIFIC_FILT
     
     filtered_df_tumor = quality_filter_tumor(df_tumor, indexes2remove, reject)
     
+    print("Filtrage des variants de qualité :", *reject, sep='\n')
     return (filtered_df_tumor,
            filtered_df_normal)
            
            
            
 if __name__ == "__main__":
-
-	sample_tumor = readVCF.read_vcf(sys.argv[1], QC = True)
-	sample_normal = readVCF.read_vcf(sys.argv[2], QC = True)
-	
-	F_sample_tumor, F_sample_normal = global_filter(sample_tumor, sample_normal)
-	
-	print(Counter(F_sample_tumor["FILTER"]),"\n","\n", Counter(F_sample_normal["FILTER"]))
+	pass
 	
 
 

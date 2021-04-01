@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import io
-import sys
 import copy
 import pandas as pd
 import numpy as np
@@ -112,13 +111,7 @@ def read_vcf(path, QC = True):
             
             
 if __name__ == "__main__":
-	my_vcf = str( sys.argv[1] )
-	QC = input("Voulez vous un contrôle qualité sur votre fichier VCF ? [o/n]")
-	if (QC.lower() == "o") or (QC.lower() == "oui") or (QC.lower() == "y") or (QC.lower() == "yes"):
-		vcf_df = read_vcf(my_vcf, QC = True)
-	else:
-		vcf_df = read_vcf(my_vcf, QC = False)
-	print (vcf_df)
+	pass
 
 
 
