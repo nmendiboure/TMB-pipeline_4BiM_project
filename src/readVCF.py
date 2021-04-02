@@ -6,7 +6,21 @@ import pandas as pd
 import numpy as np
 
 def check_extension(path):
-    #Vérifier que l'on donne bien un fichier dont l'extension est .vcf :
+    """
+    Argument :
+        
+        path : string, chemin vers le fichier à vérifier.
+        
+        Cette fonction permet de bien vérifier que le fichier d'entré contient
+    bien l'extension .vcf.
+    
+    Attention : sur Windows cela peut poser un problème car les extensions de fichiers 
+    ne sont pas toujours apparentes dans les chemins.
+    
+    Return:
+    
+        True ou False si le fichier est dans les normes.
+    """
     
     split = path.split(".")
     format_name = len(split) -1 
@@ -17,25 +31,52 @@ def check_extension(path):
     else :
         print("Succès : extension vcf détectée")
         return(True)
+def check_format(path):
+    """
+    Argument :
+    
+        path : string, chemin vers le fichier à vérifier.
         
-def check_format(file):
-    # On regarde que la première ligne soit bien de la forme ##format=VCFv4.x
-    with open(file, 'r') as f:
+        Dans tous le fichiers VCF, la première informative doit être de la forme : ##format=VCFv4.x.
+    Cette fonction permet de le vérifier, elle renvoie True dans le cas échéant et False sinon.
+    
+    Return :
+        
+        True ou False si le fichier est dans les normes.
+    """
+    with open(path, 'r') as f:
         line = f.readline()
     
     if (line.find("VCF") != -1): #Si on trouve 'VCF' dans line 
         return (True)
     else:
         return(False)
-
+        
+        
 def check_missing_data(df):
     """
-    Code pour les returns:
-    -1 : False, le fichier n'est pas bon on le rejette ;
-    0 : Le fichier est à la limite de l'acceptable (quelques NaN) 
-    et peut subir une modification pour traiter les NaN
-    1  True, le fichier est validé 
+    Argument : 
+    
+        df : dataframe.
+    
+        Cette fonction permet de vérifier si le fichier vcf n'est pas érroné.
+    Pour cela on regarde qu'il ne manque pas de colonne, s'il en manque, la fonction 
+    renvoie False avec le nom de la colonne manquante.
+    On vérifie ensuite qu'il ne manque pas d'information sur chaque variant  (ou ligne),
+    pour cela on regarde qu'il n'y ait pas de NaN. S'il y a trop de NaN, elle return False,
+    si le nombre de NaN est faible comparé à la taille du fichier, on supprime les lignes où
+    sont localisés les NaN.
+    
+    Return:
+    
+        -1 :  le fichier n'est pas bon on le rejette ;
+        
+        0 : Le fichier est à la limite de l'acceptable (quelques NaN) 
+        et peut subir une modification pour traiter les NaN ;
+        
+        1 : Le fichier est validé.
     """
+    
     #Vérifier  qu'il ne manque pas une colonne dans le ficher :
     columns = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
     for col in columns:
@@ -62,6 +103,19 @@ def check_missing_data(df):
         
         
 def drop_NaN_rows(df):
+    
+    """
+    Argument: 
+    
+        df : dataframe.
+        
+        Cette fonctionne permet de supprimer les lignes dans lesquelles on aurait des NaN.
+    
+    Return :
+    
+        new_df : dataframe dont les lignes contenant des 'NaN' ont été supprimées.
+    """
+    
     new_df = copy.deepcopy(df) # Pour ne pas ecraser notre df initial 
     NaN_line = df.isna().sum(axis=1)
     indexes = []
@@ -75,6 +129,19 @@ def drop_NaN_rows(df):
     return (new_df)
     
 def quality_control(df):
+    """
+    Argument:
+    
+        df : dataframe à controler.
+        
+        Cette fonction fait appel à notre fonction check_missing_data,
+    elle fait une synthèse sur la qualité de notre fichier au moment de l'importer
+    dans la fonction read_vcf.
+    
+    Return : 
+        
+        df2 : dataframe avec contrôle qualité effectué.
+    """
     
     miss = check_missing_data(df)
     #print(miss)
@@ -91,6 +158,22 @@ def quality_control(df):
         return (df2)
         
 def read_vcf(path, QC = True):
+    """
+    Arguments :
+        
+        path : string,  chemin vers le fichier vcf à importer ;
+        
+        QC : booléen, effectue un controle qualité si True.
+    
+        Cette fonction permet d'importer un fichier vcf et de le convertir en dataframe.
+    Il y a la possiblité de faire en amont un contrôle qualité via l'appel de la fonction quality_control 
+    si QC == True, sinon importation classique. 
+    
+    Return :
+        
+        vcf_df : dataframe du fichier vcf importé.
+    """
+    
     if (check_extension(path) == True) and (check_format(path) == True) :
         with open(path, 'r') as f:
             lines = [l for l in f if not l.startswith('##')]

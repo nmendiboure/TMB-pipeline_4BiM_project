@@ -9,12 +9,23 @@ def is_synonymous():
 
 def compare(df_tumor, df_normal):
     """
-    On regarde si une mutation présente dans le fichier vcf tumoral 
-    est également présente dans le fichier vcf sain (dit normal). 
-    Dans le cas échéant on ne compte pas cette mutation comme étant une mutation propre à la tumeur,
-    car elle est localisée à d'autres endroits dans l'organisme (simple SNP par exemple).
-    Dans le cas contraire on peut considèrer cette mutation comme étant somatic est propre à la tumeur.
+    Arguments :
+    
+        df_tumor : dataframe issu d'un vcf de tissu tumoral ;
+        
+        df_normal : dataframe issu d'un vcf de tissu sain ;
+    
+            On regarde si une mutation présente dans le fichier vcf tumoral est également présente 
+        dans le fichier vcf sain (dit normal). Dans le cas échéant on ne compte pas cette mutation 
+        comme étant une mutation propre à la tumeur, car elle est peut être localisée à d'autres 
+        endroits dans l'organisme (simple SNP par exemple). 
+        Dans le cas contraire on peut considèrer cette mutation comme étant somatique est propre à la tumeur.
+        
+    Return :
+    
+        indexes : liste d'ID de mutation présentes dans le dataframe tumoral et absente dans le normal.
     """
+    
     CHROMS = np.unique(df_tumor['CHROM'].values)
     indexes = []
     
@@ -46,9 +57,21 @@ def compare(df_tumor, df_normal):
     
 def create_somatic(tumor_path, somatic_path, indexes):
     """
-    Cette fonction permet d'écrire dans un fichier toutes les mutations présentes dans le tissus tumoral,
-    et absent dans le tissus (ou échantillon) dit normal. Cette comparaison est faite avec la fonction compare
-    ci dessus. 
+    Arguments:
+    
+        tumor_path : chemin vers le fichier tumoral vcf ;
+        
+        somatic_path : chemin vers le futur fichier somatic vcf de sortie;
+        
+        indexes : indexes : liste d'ID de mutation présentes dans le dataframe tumoral et absente dans le normal. 
+        
+        Cette fonction permet d'écrire dans un fichier toutes les mutations présentes dans le tissus tumoral,
+    et absentes dans le tissu normal. Cette comparaison est faite avec la fonction compare. 
+    
+    Return :
+        
+        Rien (0)
+        
     """
     
     headers = []
@@ -71,14 +94,41 @@ def create_somatic(tumor_path, somatic_path, indexes):
     return(0)
     
 def TMB_without_somatic(df_tumor, df_normal, exome_length = 1):
+    
+    """
+    Arguments :
+    
+        df_tumor : dataframe issu d'un vcf de tissu tumoral ;
+        
+        df_normal : dataframe issu d'un vcf de tissu sain ;
+        
+        exome_length : int, tailler de l'exome de référence pour calculer un taux.
+         
+         
+    Return :
+    
+        TMB : float, Taux de mutation.
+    """
+    
     TMB=len(compare(df_tumor, df_normal))
     return(TMB/exome_length)
     
 def TMB_with_somatic(df_somatic, exome_length = 1):
     """
-    Ici on calcul notre TMB directement à partir d'un fichier vcf somatic,
+    
+    Arguments :
+    
+        df_somatic : dataframe d'un vcf somatique.
+        
+        exome_length : int, tailler de l'exome de référence pour calculer un taux.
+        
+        Ici on calcul notre TMB directement à partir d'un fichier vcf somatic,
     il y a donc moins d'étapes. Le calcul revient à prendre 
-    la longueur du nombre de mutations somatiques totales
+    la longueur du nombre de mutations somatiques totales.
+    
+    Return :
+    
+        TMB : float, Taux de mutation.
     """
     
     TMB = len(df_somatic['ALT'].values)
