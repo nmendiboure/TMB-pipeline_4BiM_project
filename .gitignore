@@ -1,3 +1,4 @@
 /vcf_files/
 /src/__pycache__/
 /annovar/
+.ipynb_checkpoints/
