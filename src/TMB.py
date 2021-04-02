@@ -92,47 +92,50 @@ def create_somatic(tumor_path, somatic_path, indexes):
                 f_out.write(lines[j])
                 
     return(0)
+
+
+def keep_variants(infile, outfile, synonyme=False, coding=True):
     
-def TMB_without_somatic(df_tumor, df_normal, exome_length = 1):
+    """coding=True => on garde toutes les mutations qui touchent à la protéine finale : stop gain, stop loss, 
+    frameshift/nonframeshift insertion/délection"""
     
+    with open(infile, "r") as infile, open(outfile, "w") as outfile:
+        for line in infile:
+            ligne=line.split()
+            if coding==True:
+                if synonyme==False and ligne[1]!="synonymous" and ligne[1]!="unknown" :
+                    outfile.write(line)
+                if synonyme==True and ligne[1]!="unknown" :
+                    outfile.write(line)
+            if coding==False:
+                if synonyme==False and ligne[1]=="nonsynonymous" :
+                    outfile.write(line)
+                if synonyme==True and (ligne[1]=="nonsynonymous" or ligne[1]=="synonymous") :
+                    outfile.write(line)
+    return (0)
+    
+
+def Compute_TMB(somatic_infile, somatic_outfile, exome_length = 1):
     """
     Arguments :
     
-        df_tumor : dataframe issu d'un vcf de tissu tumoral ;
+        somatic_infile : fichier somatique.exonic_variant_function obtenue après annovar ;
         
-        df_normal : dataframe issu d'un vcf de tissu sain ;
+        somatic_outfile : fichier filtrer après la fonction keep_variants ;
         
         exome_length : int, tailler de l'exome de référence pour calculer un taux.
-         
-         
+    
     Return :
     
         TMB : float, Taux de mutation.
     """
+    keep_variants(somatic_infile, somatic_outfile, synonyme=False, coding=True)
     
-    TMB=len(compare(df_tumor, df_normal))
-    return(TMB/exome_length)
+    with open(somatic_outfile, 'r') as infile:
+        variants = [l for l in infile]
     
-def TMB_with_somatic(df_somatic, exome_length = 1):
-    """
-    
-    Arguments :
-    
-        df_somatic : dataframe d'un vcf somatique.
-        
-        exome_length : int, tailler de l'exome de référence pour calculer un taux.
-        
-        Ici on calcul notre TMB directement à partir d'un fichier vcf somatic,
-    il y a donc moins d'étapes. Le calcul revient à prendre 
-    la longueur du nombre de mutations somatiques totales.
-    
-    Return :
-    
-        TMB : float, Taux de mutation.
-    """
-    
-    TMB = len(df_somatic['ALT'].values)
-    return (TMB/exome_length)
+    TMB = len(variants) / exome_length
+    return (TMB)
     
     
     
