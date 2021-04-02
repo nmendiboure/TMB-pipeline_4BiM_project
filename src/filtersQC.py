@@ -69,6 +69,8 @@ def quality_filter_tumor(df_tumor, index_normal, reject = ['LowQual', 'INDEL_SPE
         df_t : dataframe tumoral filtré.
     """
     
+    #print(np.unique([index_normal[i][0] for i in range(len(index_normal)) ] ) )
+    
     df_t = copy.deepcopy(df_tumor) #deep copy pour ne pas ecraser l'original
     
     for chrom_pos in index_normal: #chrom_pos : tuple (#CHROM, #POS)
@@ -78,8 +80,9 @@ def quality_filter_tumor(df_tumor, index_normal, reject = ['LowQual', 'INDEL_SPE
             tmp_index = int(np.argwhere(df_tumor["POS"].loc[df_tumor["CHROM"] == chrom].values == pos)) #indexe de cette position
             #print(chrom, pos, tmp_index)
             df_t = df_t.drop(labels = tmp_index, axis=0) #on supprime la ligne ou il y a cette position
-              
-        df_t.index = range(0, len(df_t), 1) #reajustement des indexes apres le drop
+            
+        if(len(np.unique([index_normal[i][0] for i in range(len(index_normal)) ] )) > 1):
+            df_t.index = range(0, len(df_t), 1)
     
     for muta in df_t.index: #idem que dans quality_filter_normal, on enleve les filters de mauvaise qualite
         if df_t["FILTER"][muta] in reject:
