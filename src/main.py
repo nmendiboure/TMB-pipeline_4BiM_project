@@ -51,7 +51,7 @@ def select_chr(df, chrom):
         
 
 if __name__ == "__main__":
-
+	"""
 	####################### Importation des données ######################################
 	######################################################################################
 	print("Bienvenue dans notre pipeline pour le calcul d'un TMB.")
@@ -113,12 +113,12 @@ if __name__ == "__main__":
 	#avintput_path = "./annovar/sample1/Sample1_pre_somatic_chr1.avinput"
 	#somatic_exonic_path = "./annovar/sample1/sample1_post_somatic_chr1"
 	
-	print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.")
-	print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline")
+	print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
+	print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline", "\n")
 	
 	somatic_path = input("Veuillez renseigner le chemin relatif pour votre fichier VCF somatique : ")
 	avinput_path = input("Veuillez renseigner la localisation suivie du nom du fichier avinput : ")
-	somatic_path = input("Veuillez renseigner la localisation suivie du nom du fichier exonic_variant_function : ")
+	somatic_exonic_path = input("Veuillez renseigner la localisation suivie du nom du fichier exonic_variant_function : ")
 	
 	#1) convertir notre fichier vcf au format .avinput utilisé par annovar
 	cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path)
@@ -132,5 +132,5 @@ if __name__ == "__main__":
 	cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path) + " ./annovar/humandb/" 
 	os.system(cmd2)
 	
-	print("Annotation des variants avec ANNOVAR faite.")"""
+	print("Annotation des variants avec ANNOVAR faite.")
 		
