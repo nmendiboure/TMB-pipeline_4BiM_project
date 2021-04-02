@@ -96,8 +96,23 @@ def create_somatic(tumor_path, somatic_path, indexes):
 
 def keep_variants(infile, outfile, synonyme=False, coding=True):
     
-    """coding=True => on garde toutes les mutations qui touchent à la protéine finale : stop gain, stop loss, 
-    frameshift/nonframeshift insertion/délection"""
+    """
+    Arguments :
+    
+        infile : fichier somatic obtenue après annovar ;
+        
+        outfile : fichier somatic filtré en ne gardant que certaines mutations (choix de l'utilisateur); 
+        
+        synonyme : booléen, True : on garde les mutation synonymes, sinon False ;
+        
+        coding : booléen, True : on garde toutes les mutations qui touchent à la protéine finale
+                (ex : stop gain, stop loss, frameshift/nonframeshift, insertion/délection)
+        
+        
+        Return :
+        
+            rien (0)
+    """
     
     with open(infile, "r") as infile, open(outfile, "w") as outfile:
         for line in infile:
