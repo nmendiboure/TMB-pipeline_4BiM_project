@@ -19,10 +19,10 @@ fonction de ce qui semble être promu par la bibliographie.
 
 - *Implémentation du pipeline* (données d’entrée WES tissu tumoral & tissu normal):
 
-  + Traitement des fichiers fastq : QC
-  + Alignement
-  + Recherche des variants et annotation
-  + Calcul du TMB
+  + Importation de fichiers VCF ;
+  + Contrôle qualité du fichier et des variants ;
+  + Recherche des variants et annotation;
+  + Calcul du TMB;
   + Prévoir en option le fait de ne pas avoir de tissu normal.
   
   
@@ -32,7 +32,7 @@ fonction de ce qui semble être promu par la bibliographie.
 - Dossier /samples/ où il faudra mettre l'ensemble des échantillons et données nécessaire au calcul du TMB ;
 - Un zip *annovar.zip* qui comprend le logiciel Annovar dans sa version 20210202 .
 
-Attention toutefois nous ne pouvons fournir de fichiers VCF car ceux ci sont confidentiel, il faudra donc utiliser les votres. 
+Attention toutefois nous ne pouvons fournir de fichiers VCF car ceux ci sont confidentiels, il faudra donc utiliser les votres. 
 
 ### Utilisation :
 
