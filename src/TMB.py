@@ -10,29 +10,29 @@ def is_synonymous():
 def compare(df_tumor, df_normal):
     """
     Arguments :
-    
+
         df_tumor : dataframe issu d'un vcf de tissu tumoral ;
-        
+
         df_normal : dataframe issu d'un vcf de tissu sain ;
-    
-            On regarde si une mutation présente dans le fichier vcf tumoral est également présente 
-        dans le fichier vcf sain (dit normal). Dans le cas échéant on ne compte pas cette mutation 
-        comme étant une mutation propre à la tumeur, car elle est peut être localisée à d'autres 
-        endroits dans l'organisme (simple SNP par exemple). 
+
+            On regarde si une mutation présente dans le fichier vcf tumoral est également présente
+        dans le fichier vcf sain (dit normal). Dans le cas échéant on ne compte pas cette mutation
+        comme étant une mutation propre à la tumeur, car elle est peut être localisée à d'autres
+        endroits dans l'organisme (simple SNP par exemple).
         Dans le cas contraire on peut considèrer cette mutation comme étant somatique est propre à la tumeur.
-        
+
     Return :
-    
+
         indexes : liste d'ID de mutation présentes dans le dataframe tumoral et absente dans le normal.
     """
-    
+
     CHROMS = np.unique(df_tumor['CHROM'].values)
     indexes = []
-    
+
     for _chr_ in CHROMS:
         df_t = df_tumor.loc[df_tumor["CHROM"] == _chr_]
         df_n = df_normal.loc[df_normal["CHROM"] == _chr_]
-    
+
         #df to np
         POS_tumor = df_t['POS'].values
         POS_normal = df_n['POS'].values
@@ -44,7 +44,7 @@ def compare(df_tumor, df_normal):
 
             #On identifie une mutation par ses positions de début et de fin (start et end)
             if (START in list(POS_normal)): #même debut ?
-                # !!une meme position peut sur des chr differents!! 
+                # !!une meme position peut sur des chr differents!!
                 index = int(np.argwhere(POS_normal == START))
                 if (END == int(POS_normal[index]) + len(list(df_n['ALT'][index]) ) ): #même fin ?
                     pass # non somatique
@@ -52,28 +52,28 @@ def compare(df_tumor, df_normal):
                     indexes.append(df_t['ID'][muta])
             else:
                 indexes.append(df_t['ID'][muta])
-                
+
     return (indexes)
-    
+
 def create_somatic(tumor_path, somatic_path, indexes):
     """
     Arguments:
-    
+
         tumor_path : chemin vers le fichier tumoral vcf ;
-        
+
         somatic_path : chemin vers le futur fichier somatic vcf de sortie;
-        
-        indexes : indexes : liste d'ID de mutation présentes dans le dataframe tumoral et absente dans le normal. 
-        
+
+        indexes : indexes : liste d'ID de mutation présentes dans le dataframe tumoral et absente dans le normal.
+
         Cette fonction permet d'écrire dans un fichier toutes les mutations présentes dans le tissus tumoral,
-    et absentes dans le tissu normal. Cette comparaison est faite avec la fonction compare. 
-    
+    et absentes dans le tissu normal. Cette comparaison est faite avec la fonction compare.
+
     Return :
-        
+
         Rien (0)
-        
+
     """
-    
+
     headers = []
     lines = []
 
@@ -90,30 +90,30 @@ def create_somatic(tumor_path, somatic_path, indexes):
         for j in range(len(lines)-1):
             if (lines[j].split()[2] in indexes):
                 f_out.write(lines[j])
-                
+
     return(0)
 
 
 def keep_variants(infile, outfile, synonyme=False, coding=True):
-    
+
     """
     Arguments :
-    
+
         infile : fichier somatic obtenue après annovar ;
-        
-        outfile : fichier somatic filtré en ne gardant que certaines mutations (choix de l'utilisateur); 
-        
+
+        outfile : fichier somatic filtré en ne gardant que certaines mutations (choix de l'utilisateur);
+
         synonyme : booléen, True : on garde les mutation synonymes, sinon False ;
-        
+
         coding : booléen, True : on garde toutes les mutations qui touchent à la protéine finale
                 (ex : stop gain, stop loss, frameshift/nonframeshift, insertion/délection)
-        
-        
+
+
         Return :
-        
+
             rien (0)
     """
-    
+
     with open(infile, "r") as infile, open(outfile, "w") as outfile:
         for line in infile:
             ligne=line.split()
@@ -128,32 +128,48 @@ def keep_variants(infile, outfile, synonyme=False, coding=True):
                 if synonyme==True and (ligne[1]=="nonsynonymous" or ligne[1]=="synonymous") :
                     outfile.write(line)
     return (0)
-    
 
-def Compute_TMB(somatic_infile, somatic_outfile, exome_length = 1):
+
+def Compute_TMB_without_somatic(somatic_infile, somatic_outfile, exome_length = 1):
     """
     Arguments :
-    
+
         somatic_infile : fichier somatique.exonic_variant_function obtenue après annovar ;
-        
+
         somatic_outfile : fichier filtrer après la fonction keep_variants ;
-        
+
         exome_length : int, tailler de l'exome de référence pour calculer un taux.
-    
+
     Return :
-    
+
         TMB : float, Taux de mutation.
     """
     keep_variants(somatic_infile, somatic_outfile, synonyme=False, coding=True)
-    
+
     with open(somatic_outfile, 'r') as infile:
         variants = [l for l in infile]
-    
+
     TMB = len(variants) / exome_length
     return (TMB)
-    
-    
-    
+
+def Compute_TMB_with_somatic(somatic_infile, exome_length = 1):
+    """
+    Arguments :
+
+        somatic_infile : fichier somatique.exonic_variant_function obtenue après annovar ;
+
+        exome_length : int, tailler de l'exome de référence pour calculer un taux.
+
+    Return :
+
+        TMB : float, Taux de mutation.
+    """
+
+    with open(somatic_infile, 'r') as infile:
+        variants = [l for l in infile]
+
+    TMB = len(variants) / exome_length
+    return (TMB)
+
 if __name__ == "__main__":
 	pass
-

@@ -31,6 +31,7 @@ def check_extension(path):
     else :
         print("Succès : extension vcf détectée")
         return(True)
+
 def check_format(path):
     """
     Argument :
