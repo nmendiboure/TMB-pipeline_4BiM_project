@@ -28,7 +28,7 @@ if __name__ == "__main__":
     ######################################################################################
     QC = ""
     while (QC not in _YES_) and (QC not in _NO_) :
-    	QC = input("Voulez vous un contrôle qualité sur vos fichier VCF ? [o/n]  ").lower()
+    	QC = input("Voulez vous un contrôle qualité sur vos fichiers VCF ? [o/n]  ").lower()
 
     if (QC in _YES_): #si oui
     	df_tumor = readVCF.read_vcf(path_tumor, QC = True)
