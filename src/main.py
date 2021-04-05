@@ -4,51 +4,13 @@ import readVCF
 import filtersQC
 import TMB
 
-import copy
+
 import os
-import sys
-import pandas as pd
-import numpy as np
-from collections import Counter
+
 
 #VCF tumoral : ../vcf_files/sample1/Sample1_tumor_dna.vcf
 #VCF normal : ../vcf_files/sample1/Sample1-PBMC_normal_dna.vcf
 #VCF somatic : ../vcf_files/sample1/Sample1_pre_somatic.vcf
-
-def select_chr(df, chrom):
-    """
-    Arguments :
-
-        df : dataframe.
-
-        chrom : liste, le ou les chromosomes à conserver.
-
-        Cette fonction permet de ne conserver qu'un ou plusieurs chromosomes parmi l'ensemble du dataframe,
-    afin de réduire le dataframe et ainsi reduire les temps de chargement pour la suite de ce pipeline
-    (ex : calcul du TMB qui peut être très long selon la taille du fichier etc ..)
-
-    Return :
-
-        new_df : dataframe n'ayant conservé que l'information sur les chromosomes renseignés par l'utilisateur.
-    """
-    new_df = copy.deepcopy(df)
-
-    if (len(chrom) == 1): #Garder un seul chromosome
-        new_df = df.loc[df["CHROM"] == str(chrom[0])]
-        new_df.index = range(0, len(new_df), 1)  #reajustement des indexes
-        return(new_df)
-
-    elif (len(chrom) >1): #Conserver plusieurs chromosomes
-        chrom = sorted(chrom) # numero chromosome dans l'ordre croissant
-        new_df = df.loc[df["CHROM"] == str(chrom[0])]
-        for i in range(1, len(chrom), 1):
-            tmp_df = df.loc[df["CHROM"] == str(chrom[i])]
-            new_df = pd.concat([new_df, tmp_df])
-            #print(len(tmp_df), len(new_df))
-
-        new_df.index = range(0, len(new_df), 1)
-        #print("Seuls les chromosomes suivants ont bien été conservés : ", *chrom, sep = "\n")
-        return(new_df)
 
 
 if __name__ == "__main__":
@@ -103,8 +65,8 @@ if __name__ == "__main__":
     		else:
     			chr2keep.append(chr_)
 
-    	df_tumor = select_chr(df_tumor, chr2keep)
-    	df_normal = select_chr(df_normal, chr2keep)
+    	df_tumor = readVCF.select_chr(df_tumor, chr2keep)
+    	df_normal = readVCF.select_chr(df_normal, chr2keep)
     	print("Les chromosomes suivants ont bien été conservés dans vos dataframes: ", *chr2keep, sep = "\n")
 
     else:
@@ -136,7 +98,7 @@ if __name__ == "__main__":
 
     elif (soma == '2'):
         indexes = TMB.compare(df_tumor, df_normal)
-        path_somatic = str(input("Veuillez indiquez le chemin suivie du nom du fichier de sortie somatique (.vcf) \n"))
+        path_somatic = str(input("Veuillez indiquez le chemin suivie du nom du fichier de sortie somatique (.vcf) : \n"))
 
         if (TMB.create_somatic(path_tumor, path_somatic, indexes) == 0):
             print("Fichier somatique créé ", "\n")
