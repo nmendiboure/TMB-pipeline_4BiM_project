@@ -6,11 +6,14 @@ import TMB
 
 if __name__ == "__main__":
 
+	samples_path = "./samples/"
 	################ Importation des données #############################################
 	######################################################################################
 
 	print("Veuillez indiquer le chemin relatif vers le fichier VCF somatique :", "\n")
-	path_somatic = str( input ("VCF somatique : ") )
+	path_somatic = samples_path + str( input ("VCF somatique : ") )
+
+	print(path_somatic)
 
 	######################################################################################
 
