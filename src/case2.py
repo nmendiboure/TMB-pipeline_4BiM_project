@@ -6,27 +6,22 @@ import TMB
 
 import os
 
-
-#  ./vcf_files/sample1/Sample1_tumor_dna.vcf
-#  ./vcf_files/sample1/Sample1-PBMC_normal_dna.vcf
-#  ./vcf_files/sample1/Sample1_pre_somatic.vcf
-
-#  ./annovar/sample1/Sample1_pre_somatic_chr1.avinput
-#  ./annovar/sample1/sample1_post_somatic_chr1
-
-
 if __name__ == "__main__":
+    samples_path = "./samples/"
 
     _YES_ = ['o', 'y', 'oui', 'yes', 'ok']
     _NO_ = ['n', 'no', 'non']
 
     ####################### Importation des données ######################################
     ######################################################################################
-    print("Bienvenue dans notre pipeline pour le calcul d'un TMB.")
-    print("Veuillez indiquer le chemin relatif vers les fichiers VCF (tumor et normal) :", "\n")
+    print("Veuillez indiquer le nom des fichiers VCF (tumor et normal) dans le répertoire samples :", "\n")
 
-    path_tumor = str( input ("VCF tumoral : ") )
-    path_normal = str( input ("VCF normal : ") )
+    path_tumor = samples_path + str(input("VCF tumoral : "))
+    path_normal = samples_path + str(input("VCF normal : "))
+
+    print(str(path_tumor))
+    print(str(path_normal))
+
     ######################################################################################
 
     ################ Controle qualité / verification fichier conforme ####################
@@ -94,7 +89,7 @@ if __name__ == "__main__":
 
     print("Nous allons maintenant créer un fichier vcf somatique à partir des fichiers vcf tumor et normal : \n")
 
-    path_somatic = str(input("Veuillez indiquez le chemin suivie du nom du fichier de sortie somatique (.vcf) : \n"))
+    path_somatic = samples_path + str(input("Veuillez indiquez nom du fichier VCF somatique de sortie : \n"))
     indexes = TMB.compare(df_tumor, df_normal)
 
     if (TMB.create_somatic(path_tumor, path_somatic, indexes) == 0):
@@ -118,11 +113,11 @@ if __name__ == "__main__":
     if (annovar in _YES_): #si oui
 
         somatic_path = path_somatic
-        avinput_path = input("Veuillez renseigner la localisation suivie du nom du fichier avinput : \n")
-        somatic_exonic_path = input("Veuillez renseigner la localisation suivie du nom du fichier exonic_variant_function : \n")
+        avinput_path = samples_path + input("Veuillez renseigner le du nom du fichier avinput de sortie : \n")
+        somatic_exonic_path = samples_path + input("Veuillez renseigner le nom du fichier exonic_variant_function de sortie : \n")
 
         #1) convertir notre fichier vcf au format .avinput utilisé par annovar
-        cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path)
+        cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path) + ".avinput"
         os.system(cmd0)
 
         #2) télécharger la bdd
@@ -130,7 +125,7 @@ if __name__ == "__main__":
         os.system(cmd1)
 
         #3) Annoter le fichier avinput
-        cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path) + " ./annovar/humandb/"
+        cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path)+ ".avinput" + " ./annovar/humandb/"
         os.system(cmd2)
 
         print("Annotation des variants avec ANNOVAR faite.", "\n")
@@ -147,8 +142,11 @@ if __name__ == "__main__":
 
     print("Nous allons à présent effectuer le calcul du TMB : ", "\n")
 
-    TMB = TMB.Compute_TMB( somatic_infile= str(somatic_exonic_path)+".exonic_variant_function",
-                            somatic_outfile= "./annovar/sample1/sample1_post_somatic.txt")
+    size_WES = int(input("Veuillez spécifier la taille de l'exome de référence : "))
+
+    TMB = TMB.Compute_TMB_without_somatic( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+                            				somatic_outfile= samples_path + str(somatic_exonic_path) + ".txt",
+    										exome_length=size_WES)
 
     print("Votre taux de mutations TMB vaut : {}".format(TMB))
 
