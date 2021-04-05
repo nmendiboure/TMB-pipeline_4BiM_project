@@ -4,18 +4,20 @@ import readVCF
 import filtersQC
 import TMB
 
-
 import os
 
 
-#VCF tumoral : ../vcf_files/sample1/Sample1_tumor_dna.vcf
-#VCF normal : ../vcf_files/sample1/Sample1-PBMC_normal_dna.vcf
-#VCF somatic : ../vcf_files/sample1/Sample1_pre_somatic.vcf
+#  ./vcf_files/sample1/Sample1_tumor_dna.vcf
+#  ./vcf_files/sample1/Sample1-PBMC_normal_dna.vcf
+#  ./vcf_files/sample1/Sample1_pre_somatic.vcf
+
+#  ./annovar/sample1/Sample1_pre_somatic_chr1.avinput
+#  ./annovar/sample1/sample1_post_somatic_chr1
 
 
 if __name__ == "__main__":
 
-    _YES_ = ['o', 'y', 'oui', 'yes']
+    _YES_ = ['o', 'y', 'oui', 'yes', 'ok']
     _NO_ = ['n', 'no', 'non']
 
     ####################### Importation des données ######################################
@@ -89,61 +91,52 @@ if __name__ == "__main__":
 
     ################ Création d'un fichier somatique  ####################################
     ######################################################################################
-    soma = ""
-    while (soma not in ['1', '2']):
-        soma = input("Avez vous un fichier vcf somatique (1) ou souhaitez vous en créer un (2) ? Choisissez une option (1 ou 2 ) : ")
 
-    if (soma == '1'):
-        path_somatic = input ("Veuillez indiquer le chemin relatif vers le fichier VCF somatique :", "\n")
+    print("Nous allons maintenant créer un fichier vcf somatique à partir des fichiers vcf tumor et normal : \n")
 
-    elif (soma == '2'):
-        indexes = TMB.compare(df_tumor, df_normal)
-        path_somatic = str(input("Veuillez indiquez le chemin suivie du nom du fichier de sortie somatique (.vcf) : \n"))
+    path_somatic = str(input("Veuillez indiquez le chemin suivie du nom du fichier de sortie somatique (.vcf) : \n"))
+    indexes = TMB.compare(df_tumor, df_normal)
 
-        if (TMB.create_somatic(path_tumor, path_somatic, indexes) == 0):
-            print("Fichier somatique créé ", "\n")
+    if (TMB.create_somatic(path_tumor, path_somatic, indexes) == 0):
+        print("Fichier somatique créé ", "\n")
 
-        else:
-            print("Echec de la création du fichier somatique vcf")
+    else:
+        print("Echec de la création du fichier somatique vcf")
 
-    ######################################################################################
+######################################################################################
 
-    ################ ANNOVAR #############################################################
-    ######################################################################################
-
-    #somatic_path = "./annovar/sample1/Sample1_pre_somatic_chr1.vcf"
-    #avintput_path = "./annovar/sample1/Sample1_pre_somatic_chr1.avinput"
-    #somatic_exonic_path = "./annovar/sample1/sample1_post_somatic_chr1"
+################ ANNOVAR #############################################################
+######################################################################################
 
 
-    if (soma == '2'):
-        print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
-        annovar = ""
-        while (annovar not in _YES_) and (annovar not in _NO_):
-            annovar = input("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline, [o/n] : ").lower()
+    print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
 
-        if (annovar in _YES_): #si oui
+    annovar = ""
+    while (annovar not in _YES_) and (annovar not in _NO_):
+        annovar = input("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline, OK ? [o/n] : ").lower()
 
-            somatic_path = path_somatic
-            avinput_path = input("Veuillez renseigner la localisation suivie du nom du fichier avinput : \n")
-            somatic_exonic_path = input("Veuillez renseigner la localisation suivie du nom du fichier exonic_variant_function : \n")
+    if (annovar in _YES_): #si oui
 
-            #1) convertir notre fichier vcf au format .avinput utilisé par annovar
-            cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path)
-            os.system(cmd0)
+        somatic_path = path_somatic
+        avinput_path = input("Veuillez renseigner la localisation suivie du nom du fichier avinput : \n")
+        somatic_exonic_path = input("Veuillez renseigner la localisation suivie du nom du fichier exonic_variant_function : \n")
 
-            #2) télécharger la bdd
-            cmd1 = "perl " + "./annovar/annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene " + "./annovar/humandb/"
-            os.system(cmd1)
+        #1) convertir notre fichier vcf au format .avinput utilisé par annovar
+        cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path)
+        os.system(cmd0)
 
-            #3) Annoter le fichier avinput
-            cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path) + " ./annovar/humandb/"
-            os.system(cmd2)
+        #2) télécharger la bdd
+        cmd1 = "perl " + "./annovar/annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene " + "./annovar/humandb/"
+        os.system(cmd1)
 
-            print("Annotation des variants avec ANNOVAR faite.", "\n")
+        #3) Annoter le fichier avinput
+        cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path) + " ./annovar/humandb/"
+        os.system(cmd2)
 
-        else:
-            None
+        print("Annotation des variants avec ANNOVAR faite.", "\n")
+
+    else:
+        None
 
 
 
@@ -152,6 +145,12 @@ if __name__ == "__main__":
     ################ TMB #################################################################
     ######################################################################################
 
+    print("Nous allons à présent effectuer le calcul du TMB : ", "\n")
+
+    TMB = TMB.Compute_TMB( somatic_infile= str(somatic_exonic_path)+".exonic_variant_function",
+                            somatic_outfile= "./annovar/sample1/sample1_post_somatic.txt")
+
+    print("Votre taux de mutations TMB vaut : {}".format(TMB))
 
 
     ######################################################################################
