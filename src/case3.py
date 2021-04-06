@@ -87,4 +87,64 @@ if __name__ == "__main__":
 
 	else:
 		None
+
+	######################################################################################
+
+	################ ANNOVAR #############################################################
+	######################################################################################
+
+
+	print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
+
+	annovar = ""
+	print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline. \n")
+	while (annovar not in _YES_) and (annovar not in _NO_):
+	    annovar = input("Continuer ? [o/n] : ").lower()
+
+	if (annovar in _YES_): #si oui
+		tumor_name = path_tumor.split('/')[-1].split('.')[0]
+		avinput_path = samples_path + tumor_name
+
+		#1) convertir notre fichier vcf au format .avinput utilisé par annovar
+		cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(path_tumor)  + " > " + str(avinput_path) + ".avinput"
+		os.system(cmd0)
+
+		#2) télécharger la bdd
+		print("La base de donnée avec le génome de référence se trouve dans le dossier /annovar/humandb.")
+
+		bdd = ""
+		while (bdd not in _YES_) and (bdd not in _NO_):
+		    bdd = str(input("Voulez vous retélécharger la base de données ? (Cette opération peut prendre du temps ) [o/n] : ")).lower()
+
+		if(bdd in _YES_):
+		    cmd1 = "perl " + "./annovar/annotate_variation.pl -downdb -webfrom annovar -build hg19 exac03 ./annovar/humandb/"
+		    os.system(cmd1)
+
+		#3) Annoter le fichier avinput
+		cmd2 = "perl "  + "./annovar/annotate_variation.pl -filter -build hg19 -dbtype exac03 " + str(avinput_path)+ ".avinput" + " ./annovar/humandb/"
+		os.system(cmd2)
+
+		print("Annotation des variants avec ANNOVAR faite.", "\n")
+
+	else:
+	    None
+
+
+
+	######################################################################################
+
+	################ TMB #################################################################
+	######################################################################################
+
+	print("Nous allons à présent effectuer le calcul du TMB : ", "\n")
+
+	size_WES = int(input("Veuillez spécifier la taille de l'exome de référence : "))
+
+	dropped = samples_path + tumor_name + ".avinput.hg19_exac03_dropped"
+
+	TMB = TMB.TMB_tumor(exac03 =  dropped, exome_length=size_WES)
+
+	print("Votre taux de mutations TMB vaut : {}".format(TMB))
+
+
 	######################################################################################
