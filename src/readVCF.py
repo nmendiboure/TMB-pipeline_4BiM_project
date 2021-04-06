@@ -138,12 +138,12 @@ def read_vcf(path, verbose = True):
     if (check_extension(path) == True) :
         if (verbose):
             print("Succès : extension vcf détectée pour le fichier{}".format(path))
-            print("\n")
 
         try:
             if (check_format(path) == True) :
                 if (verbose):
                     print("Succès : Format VCF détecté pour le fichier{}".format(path))
+                    print("\n")
                 with open(path, 'r') as f:
                     lines = [l for l in f if not l.startswith('##')]
 
