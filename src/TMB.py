@@ -170,7 +170,7 @@ def TMB_somatic(somatic_infile, exome_length = 1):
     """
 
     with open(somatic_infile, 'r') as infile:
-        variants = [l for l in f if not l.startswith('##')]
+        variants = [l for l in infile if not l.startswith('#')]
 
     TMB = len(variants) / exome_length
     return (TMB)
