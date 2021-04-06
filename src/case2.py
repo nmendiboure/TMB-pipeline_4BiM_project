@@ -142,8 +142,15 @@ if __name__ == "__main__":
         os.system(cmd0)
 
         #2) télécharger la bdd
-        cmd1 = "perl " + "./annovar/annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene " + "./annovar/humandb/"
-        os.system(cmd1)
+        print("La base de donnée avec le génome de référence se trouve dans le dossier /annovar/humandb.")
+
+        bdd = ""
+        while (bdd not in _YES_) and (bdd not in _NO_):
+            bdd = str(input("Voulez vous retélécharger la base de données ? (Cette opération peut prendre du temps ) [o/n] : ")).lower()
+
+        if(bdd in _YES_):
+            cmd1 = "perl " + "./annovar/annotate_variation.pl -downdb -buildver hg19 -webfrom annovar refGene ./annovar/humandb/"
+            os.system(cmd1)
 
         #3) Annoter le fichier avinput
         cmd2 = "perl "  + "./annovar/annotate_variation.pl -out " + str(somatic_exonic_path) + " -build hg19 " + str(avinput_path)+ ".avinput" + " ./annovar/humandb/"
@@ -165,7 +172,7 @@ if __name__ == "__main__":
 
     size_WES = int(input("Veuillez spécifier la taille de l'exome de référence : "))
 
-    TMB = TMB.Compute_TMB_without_somatic( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+    TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
                             				somatic_outfile= str(somatic_exonic_path) + ".txt",
     										exome_length=size_WES)
 
