@@ -17,10 +17,10 @@ if __name__ == "__main__":
     print("Veuillez indiquer le nom des fichiers VCF tumoral et normal (sans l'extension .vcf ) dans le répertoire samples :", "\n")
 
     path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
-    print(path_tumor)
+    print("Chemin vers le vcf tumoral : ", path_tumor, "\n")
 
     path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
-    print(path_normal)
+    print("Chemin vers le vcf normal : ", path_normal, "\n")
 
 
     ######################################################################################
@@ -31,13 +31,13 @@ if __name__ == "__main__":
     print("Importation des données VCF sous forme de dataframes. \n")
 
     while (type(readVCF.read_vcf(path_tumor, verbose = False)) == bool) or (type(readVCF.read_vcf(path_normal, verbose = False)) == bool):
-        print("Vos fichiers sont de mauvaise qualité, veuillez en introduire des nouveaux : \n")
+        print("Vos fichiers sont de mauvaise qualité ou bien sont introuvables, veuillez ré-essayer : \n")
 
         path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
-        print(path_tumor)
+        print("Chemin vers le vcf tumoral : ", path_tumor, "\n")
 
         path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
-        print(path_normal)
+        print("Chemin vers le vcf normal : ", path_normal, "\n")
 
     df_tumor = readVCF.read_vcf(path_tumor)
     df_normal = readVCF.read_vcf(path_normal)

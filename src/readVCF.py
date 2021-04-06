@@ -138,8 +138,9 @@ def read_vcf(path, verbose = True):
     if (check_extension(path) == True) :
         if (verbose):
             print("Succès : extension vcf détectée pour le fichier{}".format(path))
-        try:
+            print("\n")
 
+        try:
             if (check_format(path) == True) :
                 if (verbose):
                     print("Succès : Format VCF détecté pour le fichier{}".format(path))
@@ -154,7 +155,6 @@ def read_vcf(path, verbose = True):
                 return(vcf_df)
 
         except IOError :
-
             if(verbose):
                 print("Fichier introuvable. \n")
             return(False)

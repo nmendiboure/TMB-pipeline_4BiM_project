@@ -15,28 +15,37 @@ if __name__ == "__main__":
 
 	####################### Importation des données ######################################
 	######################################################################################
-	print("Veuillez indiquer le nom des fichiers VCF (tumor et normal) dans le répertoire samples :", "\n")
+	print("Veuillez indiquer le nom des fichiers VCF tumoral et normal (sans l'extension .vcf ) dans le répertoire samples :", "\n")
 
-	path_tumor = samples_path + str(input("VCF tumoral : "))
-
-	print(str(path_tumor))
+	path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+	print("Chemin vers le vcf tumoral : ", path_tumor, "\n")
 
 	######################################################################################
 
 	################ Controle qualité / verification fichier conforme ####################
 	######################################################################################
+	print("Importation des données VCF sous forme de dataframe. \n")
+
+	while (type(readVCF.read_vcf(path_tumor, verbose = False)) == bool):
+	    print("Votre fichier est de mauvaise qualité ou bien il est introuvable, veuillez ré-essayer: \n")
+
+	    path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+	    print("Chemin vers le vcf tumoral : ", path_tumor, "\n")
+
+	df_tumor = readVCF.read_vcf(path_tumor)
+
 	QC = ""
 	while (QC not in _YES_) and (QC not in _NO_) :
-		QC = input("Voulez vous un contrôle qualité sur votre fichier VCF ? [o/n]  ").lower()
+	    print("\n")
+	    QC = input("Voulez vous un contrôle qualité sur votre fichier VCF tumoral ? [o/n]  ").lower()
+	    print("\n")
 
 	if (QC in _YES_): #si oui
-		df_tumor = readVCF.read_vcf(path_tumor, QC = True)
+	    while (readVCF.quality_control(df_tumor) == False):
+	        print("Votre fichier est de mauvaise qualité, veuillez en introduire un nouveau : \n")
+	        path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
 
-	elif (QC in _NO_):
-		df_tumor = readVCF.read_vcf(path_tumor, QC = False)
-
-	else:
-		None
+	    df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
 	######################################################################################
 
 	################ Selection des chromosomes (si besoin) ###############################
