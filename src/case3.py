@@ -48,33 +48,6 @@ if __name__ == "__main__":
 	    df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
 	######################################################################################
 
-	################ Selection des chromosomes (si besoin) ###############################
-	######################################################################################
-
-
-	keep_chrom = ""
-	while (keep_chrom not in _YES_) and (keep_chrom not in _NO_) :
-		keep_chrom = input("Voulez vous ne conserver seulement qu'un ou plusieurs chromosomes en particulier ? [o/n]  ").lower()
-
-	if (keep_chrom in _YES_): #si oui
-		chr2keep = []
-		possible_answers = [str(i) for i in range(1, 23)] + ['X'] +['Y'] + ['MT']
-		chr2keep.append(str(input("Veuillez indiquer quel chromosome vous souhaitez conserver : ")))
-
-		while True :
-			chr_ = str(input("Veuillez indiquer un autre chromosome que vous souhaitez conserver (tapez q pour sinon) : "))
-			if (chr_ not in possible_answers):
-				break
-			else:
-				chr2keep.append(chr_)
-
-		df_tumor = readVCF.select_chr(df_tumor, chr2keep)
-		print("Les chromosomes suivants ont bien été conservés dans votre dataframe: ", *chr2keep, sep = "\n")
-
-	else:
-		None
-
-	######################################################################################
 
 	################ Controle qualité des FILTER #########################################
 	######################################################################################
