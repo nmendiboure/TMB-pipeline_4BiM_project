@@ -6,14 +6,6 @@ import case3
 
 import os
 
-
-#  Sample1_tumor_dna.vcf
-#  Sample1_normal_dna.vcf
-#  Sample1_somatic_dna.vcf
-
-#  Sample1_pre_somatic.avinput
-#  Sample1_post_somatic.exonic_variant_function
-
 if __name__ == "__main__":
 
     _YES_ = ['o', 'y', 'oui', 'yes', 'ok']
@@ -27,7 +19,7 @@ if __name__ == "__main__":
 
     option = ""
     while (option not in ('1', '2', '3')):
-        option = str(input("Veuillez inquez laquelle de ces 3 options vous souhaitez suivre ? [1/2/3] :  "))
+        option = str(input("Veuillez indiquer laquelle de ces 3 options vous souhaitez suivre ? [1/2/3] :  "))
 
     samples_dir = ""
     print("Avant de commencer, assurez vous de bien avoir déposer tous les fichiers necessaires dans le répertoire /samples/. \n")
