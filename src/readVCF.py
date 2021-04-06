@@ -29,7 +29,6 @@ def check_extension(path):
         print("Votre fichier n'est pas au bon format, format attendu : vcf")
         return(False)
     else :
-        print("Succès : extension vcf détectée")
         return(True)
 
 def check_format(path):
@@ -70,10 +69,7 @@ def check_missing_data(df):
 
     Return:
 
-        -1 :  le fichier n'est pas bon on le rejette ;
-
-        0 : Le fichier est à la limite de l'acceptable (quelques NaN)
-        et peut subir une modification pour traiter les NaN ;
+        0 :  le fichier n'est pas bon on le rejette ;
 
         1 : Le fichier est validé.
     """
@@ -82,54 +78,22 @@ def check_missing_data(df):
     columns = ['CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT']
     for col in columns:
         if (col not in df.columns):
-            print("Ce fichier vcf est incomplet")
+            print("Ce fichier vcf est incomplet \n")
             print("Il manque la colonne {}".format(col))
-            return (-1)
+            return (0)
 
     #Vérifier que chaque ligne est bien complète (pas de NaN):
     NaN_col = df.isna().sum(axis=0)
-    NaN_cutoff = 3 #nombre de NaN admissibles par fichier vcf, au dèla fichier rejetté.
 
-    if (sum(NaN_col) !=0) : #s'il y a des NaN
-        if (sum(NaN_col) <= NaN_cutoff) :
-            return(0)
+    if (sum(NaN_col) > 0) : #s'il y a des NaN
+        return(0)
 
-        else:
-            print("Votre fichier un nombre de données manquantes trop élevé.")
-            print("Veuillez fournir un vcf de meilleur qualité.")
-            return (-1)
     else:
-        print("Contrôle des NaN : Ok")
+        print("Contrôle des NaN : Ok \n")
         return(1)
 
 
-def drop_NaN_rows(df):
-
-    """
-    Argument:
-
-        df : dataframe.
-
-        Cette fonctionne permet de supprimer les lignes dans lesquelles on aurait des NaN.
-
-    Return :
-
-        new_df : dataframe dont les lignes contenant des 'NaN' ont été supprimées.
-    """
-
-    new_df = copy.deepcopy(df) # Pour ne pas ecraser notre df initial
-    NaN_line = df.isna().sum(axis=1)
-    indexes = []
-    for i, line in enumerate(NaN_line.values):
-                if (line != 0):
-                    indexes.append(i)
-    for idx in indexes :
-                new_df = df.drop([idx], axis = 0)
-
-    print("Suppression des NaN : Ok")
-    return (new_df)
-
-def quality_control(df):
+def quality_control(df, verbose = True):
     """
     Argument:
 
@@ -141,30 +105,27 @@ def quality_control(df):
 
     Return :
 
-        df2 : dataframe avec contrôle qualité effectué.
+        df : dataframe avec contrôle qualité effectué.
     """
 
     miss = check_missing_data(df)
     #print(miss)
 
-    if (miss == -1):
+    if (miss == 0):
+        if(verbose):
+            print("contrôle qualité du VCF : Mauvais. \n")
         return (False)
 
     elif (miss == 1):
-        return (df)
+        if(verbose):
+            print("Contrôle qualité du VCF : Bon. \n")
+        return (True)
 
-    elif (miss == 0):
-        df2 = drop_NaN_rows(df) #remove NaN rows
-        df2.index = range(0, len(df2),1) #car les indexes ne sont plus bons à cause du df.drop
-        return (df2)
-
-def read_vcf(path, QC = True):
+def read_vcf(path, verbose = True):
     """
     Arguments :
 
         path : string,  chemin vers le fichier vcf à importer ;
-
-        QC : booléen, effectue un controle qualité si True.
 
         Cette fonction permet d'importer un fichier vcf et de le convertir en dataframe.
     Il y a la possiblité de faire en amont un contrôle qualité via l'appel de la fonction quality_control
@@ -174,24 +135,31 @@ def read_vcf(path, QC = True):
 
         vcf_df : dataframe du fichier vcf importé.
     """
+    if (check_extension(path) == True) :
+        if (verbose):
+            print("Succès : extension vcf détectée pour le fichier{}".format(path))
+        try:
 
-    if (check_extension(path) == True) and (check_format(path) == True) :
-        with open(path, 'r') as f:
-            lines = [l for l in f if not l.startswith('##')]
+            if (check_format(path) == True) :
+                if (verbose):
+                    print("Succès : Format VCF détecté pour le fichier{}".format(path))
+                with open(path, 'r') as f:
+                    lines = [l for l in f if not l.startswith('##')]
 
-        vcf_df = pd.read_csv( io.StringIO(''.join(lines)), dtype={'#CHROM': str, 'POS': int, 'ID': str,
-                                                               'REF': str, 'ALT': str,'QUAL': str,
-                                                               'FILTER': str, 'INFO': str, 'FORMAT': str},
-                         sep='\t').rename(columns={'#CHROM': 'CHROM'})
+                vcf_df = pd.read_csv( io.StringIO(''.join(lines)), dtype={'#CHROM': str, 'POS': int, 'ID': str,
+                                                                       'REF': str, 'ALT': str,'QUAL': str,
+                                                                       'FILTER': str, 'INFO': str, 'FORMAT': str},
+                                 sep='\t').rename(columns={'#CHROM': 'CHROM'})
 
-        if (QC == True):
-            vcf_df2 = quality_control(vcf_df) #On passe notre vcf en contrôle qualité
-            print("Contrôle qualité du VCF : Ok")
-            return(vcf_df2)
+                return(vcf_df)
 
-        else:
-            print("Contrôle qualité du VCF : Non fait")
-            return(vcf_df)
+        except IOError :
+
+            if(verbose):
+                print("Fichier introuvable. \n")
+            return(False)
+    else:
+        return(False)
 
 
 def select_chr(df, chrom):

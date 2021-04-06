@@ -33,11 +33,15 @@ def compare(df_tumor, df_normal):
         df_t = df_tumor.loc[df_tumor["CHROM"] == _chr_]
         df_n = df_normal.loc[df_normal["CHROM"] == _chr_]
 
+        df_t.index = range(0, len(df_t), 1)
+        df_n.index = range(0, len(df_n), 1)
+
         #df to np
         POS_tumor = df_t['POS'].values
         POS_normal = df_n['POS'].values
 
-        for muta in df_tumor.index:
+        for muta in df_t.index:
+            #print(_chr_)
             NB_ALT_tumor = len(list(df_t['ALT'][muta]))
             START = int(POS_tumor[muta])
             END = START + len(list(df_t['ALT'][muta]))

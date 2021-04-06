@@ -14,32 +14,51 @@ if __name__ == "__main__":
 
     ####################### Importation des données ######################################
     ######################################################################################
-    print("Veuillez indiquer le nom des fichiers VCF (tumor et normal) dans le répertoire samples :", "\n")
+    print("Veuillez indiquer le nom des fichiers VCF tumoral et normal (sans l'extension .vcf ) dans le répertoire samples :", "\n")
 
-    path_tumor = samples_path + str(input("VCF tumoral : "))
-    path_normal = samples_path + str(input("VCF normal : "))
+    path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+    print(path_tumor)
 
-    print(str(path_tumor))
-    print(str(path_normal))
+    path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
+    print(path_normal)
+
 
     ######################################################################################
 
     ################ Controle qualité / verification fichier conforme ####################
     ######################################################################################
+
+    print("Importation des données VCF sous forme de dataframes. \n")
+
+    while (type(readVCF.read_vcf(path_tumor, verbose = False)) == bool) or (type(readVCF.read_vcf(path_normal, verbose = False)) == bool):
+        print("Vos fichiers sont de mauvaise qualité, veuillez en introduire des nouveaux : \n")
+
+        path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+        print(path_tumor)
+
+        path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
+        print(path_normal)
+
+    df_tumor = readVCF.read_vcf(path_tumor)
+    df_normal = readVCF.read_vcf(path_normal)
+
     QC = ""
     while (QC not in _YES_) and (QC not in _NO_) :
-    	QC = input("Voulez vous un contrôle qualité sur vos fichiers VCF ? [o/n]  ").lower()
+        print("\n")
+        QC = input("Voulez vous un contrôle qualité sur vos fichiers VCF ? [o/n]  ").lower()
+        print("\n")
 
     if (QC in _YES_): #si oui
-    	df_tumor = readVCF.read_vcf(path_tumor, QC = True)
-    	df_normal = readVCF.read_vcf(path_normal, QC = True)
+        while (readVCF.quality_control(df_tumor) == False) or (readVCF.quality_control(df_normal) == False):
+            print("Vos fichiers sont de mauvaise qualité, veuillez en introduire des nouveaux : \n")
+            path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+            path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
 
-    elif (QC in _NO_):
-    	df_tumor = readVCF.read_vcf(path_tumor, QC = False)
-    	df_normal = readVCF.read_vcf(path_normal, QC = False)
+        df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
+        df_normal = readVCF.read_vcf(path_normal,  verbose = False)
 
-    else:
-        None
+
+
     ######################################################################################
 
     ################ Selection des chromosomes (si besoin) ###############################
@@ -89,7 +108,8 @@ if __name__ == "__main__":
 
     print("Nous allons maintenant créer un fichier vcf somatique à partir des fichiers vcf tumor et normal : \n")
 
-    path_somatic = samples_path + str(input("Veuillez indiquez nom du fichier VCF somatique de sortie : \n"))
+    somatic_name = str(input("Veuillez indiquez nom du fichier VCF somatique de sortie (sans l'extension .vcf) : \n"))
+    path_somatic = samples_path + somatic_name + ".vcf"
     indexes = TMB.compare(df_tumor, df_normal)
 
     if (TMB.create_somatic(path_tumor, path_somatic, indexes) == 0):
@@ -107,17 +127,18 @@ if __name__ == "__main__":
     print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
 
     annovar = ""
+    print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline. \n")
     while (annovar not in _YES_) and (annovar not in _NO_):
-        annovar = input("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline, OK ? [o/n] : ").lower()
+        annovar = input("Continuer ? [o/n] : ").lower()
 
     if (annovar in _YES_): #si oui
 
-        somatic_path = path_somatic
-        avinput_path = samples_path + input("Veuillez renseigner le du nom du fichier avinput de sortie : \n")
-        somatic_exonic_path = samples_path + input("Veuillez renseigner le nom du fichier exonic_variant_function de sortie : \n")
+        somatic_annovar_name = somatic_name + "_annovar"
+        avinput_path = samples_path + somatic_annovar_name
+        somatic_exonic_path = samples_path + somatic_annovar_name
 
         #1) convertir notre fichier vcf au format .avinput utilisé par annovar
-        cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(somatic_path) + " > " + str(avinput_path) + ".avinput"
+        cmd0 = "perl " +  "./annovar/convert2annovar.pl -format vcf4 " + str(path_somatic)  + " > " + str(avinput_path) + ".avinput"
         os.system(cmd0)
 
         #2) télécharger la bdd
@@ -145,7 +166,7 @@ if __name__ == "__main__":
     size_WES = int(input("Veuillez spécifier la taille de l'exome de référence : "))
 
     TMB = TMB.Compute_TMB_without_somatic( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
-                            				somatic_outfile= samples_path + str(somatic_exonic_path) + ".txt",
+                            				somatic_outfile= str(somatic_exonic_path) + ".txt",
     										exome_length=size_WES)
 
     print("Votre taux de mutations TMB vaut : {}".format(TMB))
