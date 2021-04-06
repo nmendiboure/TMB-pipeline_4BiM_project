@@ -186,7 +186,7 @@ def select_chr(df, chrom):
         return(new_df)
 
     elif (len(chrom) >1): #Conserver plusieurs chromosomes
-        chrom = sorted(chrom) # numero chromosome dans l'ordre croissant
+        chrom = np.unique(sorted(chrom)) # numero chromosome dans l'ordre croissant
         new_df = df.loc[df["CHROM"] == str(chrom[0])]
         for i in range(1, len(chrom), 1):
             tmp_df = df.loc[df["CHROM"] == str(chrom[i])]
