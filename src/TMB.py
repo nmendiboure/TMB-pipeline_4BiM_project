@@ -134,7 +134,7 @@ def keep_variants(infile, outfile, synonyme=False, coding=True):
     return (0)
 
 
-def Compute_TMB_without_somatic(somatic_infile, somatic_outfile, exome_length = 1):
+def TMB_tumor_normal(somatic_infile, somatic_outfile, exome_length = 1, synonyme = False, coding = True):
     """
     Arguments :
 
@@ -148,7 +148,7 @@ def Compute_TMB_without_somatic(somatic_infile, somatic_outfile, exome_length = 
 
         TMB : float, Taux de mutation.
     """
-    keep_variants(somatic_infile, somatic_outfile, synonyme=False, coding=True)
+    keep_variants(somatic_infile, somatic_outfile, synonyme, coding)
 
     with open(somatic_outfile, 'r') as infile:
         variants = [l for l in infile]
@@ -156,7 +156,7 @@ def Compute_TMB_without_somatic(somatic_infile, somatic_outfile, exome_length = 
     TMB = len(variants) / exome_length
     return (TMB)
 
-def Compute_TMB_with_somatic(somatic_infile, exome_length = 1):
+def TMB_somatic(somatic_infile, exome_length = 1):
     """
     Arguments :
 
@@ -170,10 +170,35 @@ def Compute_TMB_with_somatic(somatic_infile, exome_length = 1):
     """
 
     with open(somatic_infile, 'r') as infile:
-        variants = [l for l in infile if not l.startswith('#')]
+        variants = [l for l in f if not l.startswith('##')]
 
     TMB = len(variants) / exome_length
     return (TMB)
+
+
+def TMB_tumor (exac03, exome_length = 1):
+    """
+    Argument :
+        exac03 : chemin vers fichier texte issus de annovar avec la probabilité pour chaque variant d'être associé
+        à la tumeur ;
+
+        exome_length : int, tailler de l'exome de référence pour calculer un taux.
+
+    Return :
+
+        TMB : float, Taux de mutation.
+    """
+
+    TMB = 0
+    with open(str(exac03), "r") as exac03:
+
+        for line in exac03:
+            line_sp=line.split('\t')
+
+            if float(line_sp[1]) == 0:
+                TMB += 1
+
+    return(TMB / exome_length)
 
 if __name__ == "__main__":
 	pass
