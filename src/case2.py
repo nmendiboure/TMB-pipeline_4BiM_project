@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import readVCF
 import filtersQC
@@ -42,20 +42,15 @@ if __name__ == "__main__":
     df_tumor = readVCF.read_vcf(path_tumor)
     df_normal = readVCF.read_vcf(path_normal)
 
-    QC = ""
-    while (QC not in _YES_) and (QC not in _NO_) :
-        print("\n")
-        QC = input("Voulez vous un contrôle qualité sur vos fichiers VCF ? [o/n]  ").lower()
-        print("\n")
+    print("Nous allons maintenant vérifier que les fichiers sont bien conformes : \n")
 
-    if (QC in _YES_): #si oui
-        while (readVCF.quality_control(df_tumor) == False) or (readVCF.quality_control(df_normal) == False):
-            print("Vos fichiers sont de mauvaise qualité, veuillez en introduire des nouveaux : \n")
-            path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
-            path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
+    while (readVCF.quality_control(df_tumor) == False) or (readVCF.quality_control(df_normal) == False):
+        print("Vos fichiers sont de mauvaise qualité, veuillez en introduire des nouveaux : \n")
+        path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+        path_normal = samples_path + str(input("VCF normal :  ")) + ".vcf"
 
-        df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
-        df_normal = readVCF.read_vcf(path_normal,  verbose = False)
+    df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
+    df_normal = readVCF.read_vcf(path_normal,  verbose = False)
 
 
 
@@ -67,15 +62,15 @@ if __name__ == "__main__":
 
     keep_chrom = ""
     while (keep_chrom not in _YES_) and (keep_chrom not in _NO_) :
-    	keep_chrom = input("Voulez vous ne conserver seulement qu'un ou plusieurs chromosomes en particulier ? [o/n]  ").lower()
+    	keep_chrom = input("Voulez vous conserver un ou plusieurs chromosomes en particulier ? [o/n]  ").lower()
 
     if (keep_chrom in _YES_): #si oui
     	chr2keep = []
     	possible_answers = [str(i) for i in range(1, 23)] + ['X'] +['Y'] + ['MT']
-    	chr2keep.append(str(input("Veuillez indiquer quel chromosome vous souhaitez conserver : ")))
+    	chr2keep.append(str(input("Veuillez indiquer quel chromosome vous souhaitez conserver ( 1 à la fois ): ")))
 
     	while True :
-    		chr_ = str(input("Veuillez indiquer un autre chromosome que vous souhaitez conserver (tapez q pour sinon) : "))
+    		chr_ = str(input("Veuillez indiquer un autre chromosome que vous souhaitez conserver ('Entrée' sinon) : "))
     		if (chr_ not in possible_answers):
     			break
     		else:
@@ -108,7 +103,7 @@ if __name__ == "__main__":
 
     print("Nous allons maintenant créer un fichier vcf somatique à partir des fichiers vcf tumor et normal : \n")
 
-    somatic_name = str(input("Veuillez indiquez nom du fichier VCF somatique de sortie (sans l'extension .vcf) : \n"))
+    somatic_name = str(input("Veuillez indiquer le nom du fichier VCF somatique de sortie (sans l'extension .vcf) : \n"))
     path_somatic = samples_path + somatic_name + ".vcf"
     indexes = TMB.compare(df_tumor, df_normal)
 
@@ -124,10 +119,10 @@ if __name__ == "__main__":
 ######################################################################################
 
 
-    print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
+    print("Nous allons maintenant procéder à l'annotation des variants à l'aide du logiciel ANNOVAR.", "\n")
 
     annovar = ""
-    print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline. \n")
+    print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principal de ce pipeline. \n")
     while (annovar not in _YES_) and (annovar not in _NO_):
         annovar = input("Continuer ? [o/n] : ").lower()
 

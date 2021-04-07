@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import readVCF
 import copy
@@ -26,7 +26,7 @@ def quality_filter(df, reject = ['LowQual', 'INDEL_SPECIFIC_FILTERS;LowQual']):
 
     for muta in df.index: #idem que dans quality_filter_normal, on enleve les filters de mauvaise qualite
         if df["FILTER"][muta] in reject:
-            new_df = new_df.drop(labels = muta, axis=0)
+            new_df = df.drop(labels = muta, axis=0)
 
     new_df.index = range(0, len(new_df), 1)  #reajustement des indexes apres le drop
     print("Filtrage des variants de qualité :", *reject, sep='\n')
@@ -67,7 +67,7 @@ def quality_filter_normal(df_normal, reject = ['LowQual', 'INDEL_SPECIFIC_FILTER
             indexes.append( (df_normal["CHROM"][muta], df_normal["POS"][muta]))
 
             #On supprime ensuite la ligne correspondante car mauvaise qualite
-            df_n = df_n.drop(labels = muta, axis=0)
+            df_n = df_normal.drop(labels = muta, axis=0)
 
     df_n.index = range(0, len(df_n), 1) #reajustement des indexes apres le drop
 
@@ -112,7 +112,7 @@ def quality_filter_tumor(df_tumor, index_normal, reject = ['LowQual', 'INDEL_SPE
             df_t.index = range(0, len(df_t), 1)
 
     for muta in df_t.index: #idem que dans quality_filter_normal, on enleve les filters de mauvaise qualite
-        if df_t["FILTER"][muta] in reject:
+        if df_tumor["FILTER"][muta] in reject:
             df_t = df_tumor.drop(labels = muta, axis=0)
 
     df_t.index = range(0, len(df_t), 1)  #reajustement des indexes apres le drop

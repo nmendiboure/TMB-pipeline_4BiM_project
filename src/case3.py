@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import readVCF
 import filtersQC
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
 	####################### Importation des données ######################################
 	######################################################################################
-	print("Veuillez indiquer le nom des fichiers VCF tumoral et normal (sans l'extension .vcf ) dans le répertoire samples :", "\n")
+	print("Veuillez indiquer le nom du fichier VCF tumoral (sans l'extension .vcf ) dans le répertoire samples :", "\n")
 
 	path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
 	print("Chemin vers le vcf tumoral : ", path_tumor, "\n")
@@ -34,18 +34,13 @@ if __name__ == "__main__":
 
 	df_tumor = readVCF.read_vcf(path_tumor)
 
-	QC = ""
-	while (QC not in _YES_) and (QC not in _NO_) :
-	    print("\n")
-	    QC = input("Voulez vous un contrôle qualité sur votre fichier VCF tumoral ? [o/n]  ").lower()
-	    print("\n")
+	print("Nous allons maintenant vérifier que votre fichier est bien conforme : \n")
 
-	if (QC in _YES_): #si oui
-	    while (readVCF.quality_control(df_tumor) == False):
-	        print("Votre fichier est de mauvaise qualité, veuillez en introduire un nouveau : \n")
-	        path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
+	while (readVCF.quality_control(df_tumor) == False):
+		print("Votre fichier est de mauvaise qualité, veuillez en introduire un nouveau : \n")
+		path_tumor = samples_path + str(input("VCF tumoral : ")) + ".vcf"
 
-	    df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
+	df_tumor = readVCF.read_vcf(path_tumor, verbose = False)
 	######################################################################################
 
 
@@ -67,10 +62,10 @@ if __name__ == "__main__":
 	######################################################################################
 
 
-	print("Nous allons maintenant procéder à l'analyse des variant à l'aide du logiciel ANNOVAR.", "\n")
+	print("Nous allons maintenant procéder à l'annotation des variants à l'aide du logiciel ANNOVAR.", "\n")
 
 	annovar = ""
-	print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principale de ce pipeline. \n")
+	print("Avant de commencer, assurez vous de bien avoir le logiciel ANNOVAR (dossier /annovar/) dans le répertoire principal de ce pipeline. \n")
 	while (annovar not in _YES_) and (annovar not in _NO_):
 	    annovar = input("Continuer ? [o/n] : ").lower()
 

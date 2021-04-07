@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import case1
 import case2
@@ -22,7 +22,7 @@ if __name__ == "__main__":
         option = str(input("Veuillez indiquer laquelle de ces 3 options vous souhaitez suivre ? [1/2/3] :  "))
 
     samples_dir = ""
-    print("Avant de commencer, assurez vous de bien avoir déposer tous les fichiers necessaires dans le répertoire /samples/. \n")
+    print("Avant de commencer, assurez vous de bien avoir déposé tous les fichiers necessaires dans le répertoire /samples/. \n")
     while (samples_dir not in _YES_):
         samples_dir= input("Continuer ? [o/n] : ").lower()
 

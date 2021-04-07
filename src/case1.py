@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import readVCF
 import TMB
@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
 	####################### Importation des données ######################################
 	######################################################################################
-	print("Veuillez indiquer le nom des fichiers VCF tumoral et normal (sans l'extension .vcf ) dans le répertoire samples :", "\n")
+	print("Veuillez indiquer le nom du fichier VCF somatique (sans l'extension .vcf ) dans le répertoire samples :", "\n")
 
 	path_somatic = samples_path + str(input("VCF somatic : ")) + ".vcf"
 	print("Chemin vers le vcf somatic : ", path_somatic, "\n")
