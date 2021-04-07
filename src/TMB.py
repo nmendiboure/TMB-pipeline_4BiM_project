@@ -3,9 +3,6 @@
 import pandas as pd
 import numpy as np
 
-# Savoir si une mutation est synonyme ou pas :
-def is_synonymous():
-    pass
 
 def compare(df_tumor, df_normal):
     """
