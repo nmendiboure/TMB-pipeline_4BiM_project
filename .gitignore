@@ -2,6 +2,5 @@
 /src/__pycache__/
 /annovar/
 .ipynb_checkpoints/
-/snakemake/
 /samples/
-Dockerfile
+WorkingDirectoryDocker
