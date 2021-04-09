@@ -167,9 +167,44 @@ if __name__ == "__main__":
 
     size_WES = int(input("Veuillez spécifier la taille de l'exome de référence : "))
 
-    TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
-                            				somatic_outfile= str(somatic_exonic_path) + ".txt",
-    										exome_length=size_WES)
+    print("Pour calculer le TMB à partir du fichier somatique donné par ANNOVAR; \n")
+    print("4 options de filtrages sont possibles : \n")
+
+    print( "- Conserver uniquement les variants non synonymes (1) ;" , "\n",
+            "- Conserver les variants : non synonymes et les variants 'coding' (2) ;" , "\n",
+            "- Conserver les variants : non synonymes et synonymes mais pas les 'coding'(3) ;", "\n",
+            "- Conserver tous les variants : non synonymes, synonymes et les variants 'coding'  (4) ; ", "\n")
+
+    option = ""
+    while (option not in ('1', '2', '3', '4')):
+        option = str(input("Veuillez indiquer laquelle de ces 4 options vous souhaitez suivre ? [1/2/3/4] :  "))
+
+    if (option == '1'):
+        TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+                                	somatic_outfile= str(somatic_exonic_path) + ".txt",
+        							exome_length=size_WES,
+                                    synonyme = False, coding = False)
+
+    elif (option == '2'):
+        TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+                                	somatic_outfile= str(somatic_exonic_path) + ".txt",
+        							exome_length=size_WES,
+                                    synonyme = False, coding = True)
+
+    elif (option == '3'):
+        TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+                                	somatic_outfile= str(somatic_exonic_path) + ".txt",
+        							exome_length=size_WES,
+                                    synonyme = True, coding = False)
+
+
+    elif (option == '4'):
+        TMB = TMB.TMB_tumor_normal( somatic_infile= str(somatic_exonic_path) + ".exonic_variant_function",
+                                	somatic_outfile= str(somatic_exonic_path) + ".txt",
+        							exome_length=size_WES,
+                                    synonyme = True, coding = True)
+
+
 
     print("Votre taux de mutations TMB vaut : {}".format(TMB))
 
