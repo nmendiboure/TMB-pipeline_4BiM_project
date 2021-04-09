@@ -8,6 +8,11 @@ import os
 
 if __name__ == "__main__":
 
+    with open("./src/ASCII_title.txt") as title:
+        title = title.read()
+
+    print(title)
+
     _YES_ = ['o', 'y', 'oui', 'yes', 'ok']
     _NO_ = ['n', 'no', 'non']
 
