@@ -16,7 +16,7 @@ if __name__ == "__main__":
     _YES_ = ['o', 'y', 'oui', 'yes', 'ok']
     _NO_ = ['n', 'no', 'non']
 
-    print("Bienvenue dans notre pipeline pour le calcul d'un TMB (Tumor Mutation Burden).", "\n")
+    print("Bienvenue dans notre pipeline pour le calcul d'un TMB (Tumor Mutational Burden).", "\n")
     print("Dans ce logiciel il est possible d'obtenir un TMB selon 3 façons différentes : ", "\n",
             "- A partir d'un fichier VCF somatique (1) ;" , "\n",
             "- A partir d'un fichier VCF tumoral et d'un VCF complémentaire normal (2) ;", "\n",
